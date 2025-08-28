@@ -1,0 +1,205 @@
+openapi: 3.0.0
+info:
+  title: "Simplified Slide Update & Read API"
+  description: "A focused subset of the Google Slides API for reading presentation structures and updating text content."
+  version: "1.0.3"
+
+paths:
+  /v1/presentations/{presentationId}:
+    get:
+      summary: "Read Presentation Structure"
+      description: "Retrieves the full presentation object, including all its slides, layouts (templates), and masters (themes)."
+      parameters:
+        - name: presentationId
+          in: path
+          required: true
+          description: "The ID of the presentation to read."
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Successfully retrieved the presentation object."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Presentation'
+              example:
+                presentationId: "abc123-presentation-id"
+                layouts:
+                  - objectId: "g1_layout_TitleSlide"
+                    layoutProperties:
+                      displayName: "Title Slide"
+                    pageElements:
+                      - objectId: "g1_title_1"
+                        shape:
+                          placeholder:
+                            type: "TITLE"
+                      - objectId: "g1_subtitle_1"
+                        shape:
+                          placeholder:
+                            type: "SUBTITLE"
+                  - objectId: "g2_layout_TitleAndBody"
+                    layoutProperties:
+                      displayName: "Title and Body"
+                    pageElements:
+                      - objectId: "g2_title_1"
+                        shape:
+                          placeholder:
+                            type: "TITLE"
+                      - objectId: "g2_body_1"
+                        shape:
+                          placeholder:
+                            type: "BODY"
+                slides: [] # Slides array would be populated similarly
+
+  /v1/presentations/{presentationId}:batchUpdate:
+    post:
+      summary: "Update Slide Content"
+      description: "Executes a batch of requests to update a presentation. This is used to insert or change text on a specific slide."
+      parameters:
+        - name: presentationId
+          in: path
+          required: true
+          description: "The ID of the presentation to update."
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchUpdateRequest'
+      responses:
+        '200':
+          description: "Successfully updated the presentation."
+
+components:
+  schemas:
+    # Schema for the GET response
+    Presentation:
+      type: object
+      properties:
+        presentationId:
+          type: string
+        layouts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Page'
+        masters:
+          type: array
+          items:
+            $ref: '#/components/schemas/Page'
+        slides:
+          type: array
+          items:
+            $ref: '#/components/schemas/Page'
+
+    # A simplified Page object (represents a slide, layout, or master)
+    Page:
+      type: object
+      properties:
+        objectId:
+          type: string
+        pageProperties:
+          type: object
+          properties:
+            pageBackgroundFill:
+              type: object # Contains theme color info
+        layoutProperties:
+          type: object
+          properties:
+            displayName:
+              type: string # The user-friendly name of the layout
+        pageElements:
+          type: array
+          items:
+            $ref: '#/components/schemas/PageElement'
+    
+    # A simplified PageElement (represents a shape like a textbox)
+    PageElement:
+      type: object
+      properties:
+        objectId:
+          type: string # This is the ID you need for the contentMap
+        shape:
+          type: object
+          properties:
+            placeholder:
+              type: object # If this exists, it's a placeholder textbox
+              properties:
+                type:
+                  type: string
+                  enum: [TITLE, BODY, SUBTITLE, OBJECT]
+
+    # Schema for the POST request
+    BatchUpdateRequest:
+      type: object
+      properties:
+        requests:
+          type: array
+          items:
+            type: object
+            description: "A list of different request types. Only one of the following should be present in each object."
+            properties:
+              insertText:
+                $ref: '#/components/schemas/InsertTextRequest'
+              createSlide:
+                $ref: '#/components/schemas/CreateSlideRequest'
+              createImage:
+                $ref: '#/components/schemas/CreateImageRequest'
+      example:
+        requests:
+          - createSlide:
+              slideLayoutReference:
+                layoutId: "g2_layout_TitleAndBody"
+          - insertText:
+              objectId: "g2_title_1"
+              text: "This is the new title."
+          - insertText:
+              objectId: "g2_body_1"
+              text: "This is the new body text for the slide."
+          - createImage:
+              url: "https://placehold.co/600x400/EEE/31343C?text=My+Image"
+              elementProperties:
+                pageObjectId: "p" # The ID of the slide to add the image to
+                size:
+                  width: { "magnitude": 300, "unit": "PT" }
+                  height: { "magnitude": 300, "unit": "PT" }
+
+    # Individual Request Types
+    InsertTextRequest:
+      type: object
+      properties:
+        objectId:
+          type: string
+          description: "The ID of the shape or table cell to insert text into."
+        text:
+          type: string
+          description: "The text to be inserted. Can include XML for formatting."
+
+    CreateSlideRequest:
+      type: object
+      properties:
+        slideLayoutReference:
+          type: object
+          properties:
+            layoutId:
+              type: string
+              description: "The ID of the layout to use for the new slide."
+
+    CreateImageRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: "The URL of the image to insert."
+        elementProperties:
+          type: object
+          properties:
+            pageObjectId:
+              type: string
+              description: "The ID of the slide to add the image to."
+            size:
+              type: object
+            transform:
+              type: object
