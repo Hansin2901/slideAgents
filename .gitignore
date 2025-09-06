@@ -1,0 +1,39 @@
+# Ignore Google OAuth client secret file
+client_secret_1080418670704-k0uh9qj9sstfp0lnbm7huscs63f6l2rm.apps.googleusercontent.com.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Env files
+.env
+.env.*
+
+# Flask/SQLite runtime artifacts
+instance/
+*.sqlite
+
+# Editor/OS
+.vscode/
+.DS_Store
+
+# Generic OAuth secrets (do not commit)
+client_secret*.json
+credentials.json
+token.json
+
+# Tests and pytest artifacts
+tests/
+.pytest_cache/
+coverage.xml
+.coverage
+htmlcov/
+
+AGENTS.md
