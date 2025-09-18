@@ -1,0 +1,12 @@
+.env
+tests/
+AGENTS.md
+*.json
+temp1.py
+test_layout_parse.py
+tmp.py
+temp.py
+__pycache__/
+/.venv
+uv
+uv.lock
