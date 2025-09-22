@@ -65,8 +65,8 @@ SCOPES = [
     "https://www.googleapis.com/auth/presentations",
 ]
 
-DEFAULT_PORT = int(os.environ.get("FLASK_PORT", "5000"))
-DEFAULT_HOST = os.environ.get("FLASK_HOST", "127.0.0.1")
+DEFAULT_HOST = os.environ.get("FLASK_HOST", "localhost")
+DEFAULT_PORT = int(os.environ.get("FLASK_PORT", os.environ.get("PORT", "8800")))
 REDIRECT_URI = os.environ.get("GOOGLE_REDIRECT_URI", f"http://{DEFAULT_HOST}:{DEFAULT_PORT}/callback")
 
 
