@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Generate Presentation Plan</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 2rem; }
+      form { display: flex; flex-direction: column; gap: 1rem; max-width: 480px; }
+      label { font-weight: bold; }
+      .messages { color: #b3261e; }
+      button { padding: 0.6rem 1.2rem; font-size: 1rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Orchestrator Agent</h1>
+    <p>Upload source content and specify a template ID to build a presentation plan.</p>
+    <p><a href="{{ url_for('dashboard') }}">&larr; Back to dashboard</a></p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="messages">
+          {% for category, message in messages %}
+            <p>{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" enctype="multipart/form-data">
+      <div>
+        <label for="user_file">Content File (PDF or text)</label>
+        <input id="user_file" name="user_file" type="file" accept=".pdf,.txt,.md,.markdown" required>
+      </div>
+
+      <div>
+        {% if templates %}
+          <label for="template_choice">Template</label>
+          <select id="template_choice" name="template_choice" required>
+            <option value="" disabled selected>Choose a template</option>
+            {% for tpl in templates %}
+              <option value="{{ tpl.presentation_id }}">
+                {{ tpl.title }} - {{ tpl.presentation_id }}
+              </option>
+            {% endfor %}
+            <option value="__add_new__">Add new template…</option>
+          </select>
+          <div id="new-template-row" style="display:none;margin-top:0.5rem;">
+            <label for="new_template_id">New Template ID</label>
+            <input id="new_template_id" name="new_template_id" type="text" placeholder="1AbCDefGhIJ">
+          </div>
+        {% else %}
+          <input type="hidden" name="template_choice" value="__add_new__">
+          <label for="new_template_id">Template ID</label>
+          <input id="new_template_id" name="new_template_id" type="text" placeholder="1AbCDefGhIJ" required>
+        {% endif %}
+      </div>
+
+      <div>
+        <label>
+          <input id="show_batch_requests" name="show_batch_requests" type="checkbox">
+          Show generated Slides batch requests in the result view
+        </label>
+      </div>
+
+      <button type="submit">Generate Plan</button>
+    </form>
+    <script>
+      (function () {
+        var select = document.getElementById('template_choice');
+        if (!select) {
+          return;
+        }
+        var newRow = document.getElementById('new-template-row');
+        var newInput = document.getElementById('new_template_id');
+
+        function toggleNewTemplate() {
+          var showNew = select.value === '__add_new__';
+          if (newRow) {
+            newRow.style.display = showNew ? 'block' : 'none';
+          }
+          if (newInput) {
+            if (showNew) {
+              newInput.setAttribute('required', 'required');
+            } else {
+              newInput.removeAttribute('required');
+              newInput.value = '';
+            }
+          }
+        }
+
+        select.addEventListener('change', toggleNewTemplate);
+        toggleNewTemplate();
+      })();
+    </script>
+  </body>
+</html>

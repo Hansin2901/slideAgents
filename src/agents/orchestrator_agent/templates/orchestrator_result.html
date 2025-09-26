@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Presentation Plan Result</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 2rem; }
+      pre { background: #f4f4f4; padding: 1rem; border-radius: 6px; overflow-x: auto; }
+      a { display: inline-block; margin-top: 1rem; }
+      .messages { color: #0b5394; }
+    </style>
+  </head>
+  <body>
+    <h1>Generated Presentation Plan</h1>
+    <p>The orchestrator agent produced the following JSON for template <strong>{{ template_id }}</strong>.</p>
+    <p><a href="{{ url_for('dashboard') }}">&larr; Back to dashboard</a></p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="messages">
+          {% for category, message in messages %}
+            <p>{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <pre>{{ result_json }}</pre>
+    {% if plan_snapshot_path %}
+      <p>Plan snapshot saved to <code>{{ plan_snapshot_path }}</code>.</p>
+    {% endif %}
+    {% if batch_requests_json %}
+      <h2>Slides Batch Requests</h2>
+      <pre>{{ batch_requests_json }}</pre>
+    {% endif %}
+    {% if batch_snapshot_path %}
+      <p>Batch request snapshot saved to <code>{{ batch_snapshot_path }}</code>.</p>
+    {% endif %}
+    {% if slides_response_json %}
+      <h2>Slides API Response</h2>
+      <pre>{{ slides_response_json }}</pre>
+    {% endif %}
+    <a href="{{ url_for('orchestrator.orchestrate_presentation') }}">&#8592; Generate another</a>
+  </body>
+</html>

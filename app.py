@@ -48,6 +48,13 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret-key")
 
+try:
+    from src.agents.orchestrator_agent import get_blueprint as get_orchestrator_blueprint
+
+    app.register_blueprint(get_orchestrator_blueprint())
+except Exception as exc:  # pragma: no cover - optional component
+    print("[warn] orchestrator blueprint not available:", exc)
+
 
 # ---- OAuth configuration ----
 DEFAULT_CLIENT_SECRETS = (
@@ -290,6 +297,12 @@ def dashboard():
       <p><img src="{{ photo_url }}" alt="Profile photo" style="height:96px;width:96px;border-radius:50%"></p>
     {% endif %}
 
+    <hr/>
+    <p>
+      <a href="{{ url_for('orchestrator.orchestrate_presentation') }}">
+        Launch Orchestrator Agent
+      </a>
+    </p>
     <hr/>
     <h3>Your Templates</h3>
     <ul>

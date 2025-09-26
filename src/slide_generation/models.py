@@ -6,11 +6,23 @@ from typing import Dict, List, Optional, TypedDict
 
 
 class PlaceholderType(str, Enum):
-    TITLE = "TITLE"
-    SUBTITLE = "SUBTITLE"
+    NONE = "NONE"
     BODY = "BODY"
+    CHART = "CHART"
+    CLIP_ART = "CLIP_ART"
+    CENTERED_TITLE = "CENTERED_TITLE"
+    DIAGRAM = "DIAGRAM"
+    DATE_AND_TIME = "DATE_AND_TIME"
+    FOOTER = "FOOTER"
+    HEADER = "HEADER"
+    MEDIA = "MEDIA"
+    OBJECT = "OBJECT"
     PICTURE = "PICTURE"
     SLIDE_NUMBER = "SLIDE_NUMBER"
+    SUBTITLE = "SUBTITLE"
+    TABLE = "TABLE"
+    TITLE = "TITLE"
+    SLIDE_IMAGE = "SLIDE_IMAGE"
     OTHER = "OTHER"
 
 
